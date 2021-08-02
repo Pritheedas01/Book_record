@@ -36,7 +36,7 @@ class SignupScreen extends StatelessWidget {
             height: 30.0,
           ),
           Text(
-            "SIGNUP AS RIDER",
+            "SIGNUP",
             style: TextStyle(fontSize: 24.0, fontWeight: FontWeight.w800),
             textAlign: TextAlign.center,
           ),
