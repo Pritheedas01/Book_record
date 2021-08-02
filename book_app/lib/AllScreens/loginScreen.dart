@@ -37,7 +37,7 @@ class LoginScreen extends StatelessWidget {
                 height: 50.0,
               ),
               Text(
-                "LOGIN AS RIDER",
+                "LOGIN",
                 style: TextStyle(fontSize: 24.0, fontWeight: FontWeight.w800),
                 textAlign: TextAlign.center,
               ),
