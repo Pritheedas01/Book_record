@@ -2,9 +2,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 
-
-
-
 class FilterScreen extends StatefulWidget {
   static const String idScreen = "filter";
 
@@ -14,6 +11,8 @@ class FilterScreen extends StatefulWidget {
 
 class _FilterScreenState extends State<FilterScreen> {
   static const String idScreen = "filter";
+  String valueChoose;
+  List listItem = ["author", "name", "rating"];
   TextEditingController field = new TextEditingController();
   TextEditingController feild_value = new TextEditingController();
   var firestore = FirebaseFirestore.instance.collection('Book').snapshots();
@@ -27,19 +26,19 @@ class _FilterScreenState extends State<FilterScreen> {
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: IconButton(
-              icon: Icon(Icons.search,
-                size: 25.0,),
-              onPressed: (){
+              icon: Icon(
+                Icons.search,
+                size: 25.0,
+              ),
+              onPressed: () {
                 _showDialog(context);
-
               },
-
             ),
           )
         ],
         foregroundColor: Colors.orange.shade400,
       ),
-      body:StreamBuilder(
+      body: StreamBuilder(
         stream: firestore,
         builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
           if (!snapshot.hasData) {
@@ -63,73 +62,85 @@ class _FilterScreenState extends State<FilterScreen> {
     await showDialog(
         context: context,
         builder: (context) => AlertDialog(
-          contentPadding: EdgeInsets.all(10),
-          content: Container(
-            width: MediaQuery.of(context).size.width / 1.2,
-            height: MediaQuery.of(context).size.height / 4.7,
-            child: Column(
-              children: [
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Text("FILTER DATA"),
+              contentPadding: EdgeInsets.all(10),
+              content: Container(
+                width: MediaQuery.of(context).size.width / 1.2,
+                height: MediaQuery.of(context).size.height / 4.7,
+                child: Column(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Text("FILTER DATA"),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: DropdownButton(
+                        hint: Text("Select the Field:"),
+                        icon: Icon(Icons.arrow_drop_down),
+                        iconSize: 20.0,
+                        isExpanded: true,
+                        value: valueChoose,
+                        onChanged: (newValue) {
+                          setState(() {
+                            valueChoose = newValue;
+                          });
+                        },
+                        items: listItem.map(
+                          (valueItem) {
+                            return DropdownMenuItem(
+                              value: valueItem,
+                              child: Text(valueItem),
+                            );
+                          },
+                        ).toList(),
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: TextField(
+                        autofocus: true,
+                        autocorrect: true,
+                        decoration: InputDecoration(labelText: "Field value"),
+                        controller: feild_value,
+                      ),
+                    ),
+                  ],
                 ),
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: TextField(
-                    autofocus: true,
-                    autocorrect: true,
-                    decoration: InputDecoration(labelText: "Field Name"),
-                    controller: field,
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: TextField(
-                    autofocus: true,
-                    autocorrect: true,
-                    decoration: InputDecoration(labelText: "Field value"),
-                    controller: feild_value,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          actions: [
-            FlatButton(
-                onPressed: () {
-                  field.clear();
-                  feild_value.clear();
-                  Navigator.pop(context);
-                },
-                child: Text('Cancel')),
-            FlatButton(
-                onPressed: () {
-                  setState(() {
-                    if (field.text.isEmpty) {
-                      displayToastMessage(
-                          "Please enter the feild", context);
-                    } else if (feild_value.text.isEmpty) {
-                      displayToastMessage(
-                          "Please enter the value", context);
-                    } else {
-                      firestore = FirebaseFirestore.instance
-                          .collection('Book')
-                          .where(field.text.trim(), isEqualTo: feild_value.text.trim())
-                          .snapshots();
+              ),
+              actions: [
+                FlatButton(
+                    onPressed: () {
+                      field.clear();
+                      feild_value.clear();
                       Navigator.pop(context);
-                    }
-                  });
-                },
-                child: Text("Search"))
-          ],
-        ));
+                    },
+                    child: Text('Cancel')),
+                FlatButton(
+                    onPressed: () {
+                      setState(() {
+                         if (feild_value.text.isEmpty) {
+                          displayToastMessage(
+                              "Please enter the value", context);
+                        } else {
+                          firestore = FirebaseFirestore.instance
+                              .collection('Book')
+                              .where(valueChoose.trim(),
+                                  isEqualTo: feild_value.text.trim())
+                              .snapshots();
+                          Navigator.pop(context);
+                        }
+                      });
+                    },
+                    child: Text("Search"))
+              ],
+            ));
   }
+
   displayToastMessage(String message, BuildContext context) {
     Fluttertoast.showToast(msg: message);
   }
-
-
 }
+
 class CustomCard extends StatelessWidget {
   final QuerySnapshot snapshot;
   final int index;
@@ -141,11 +152,11 @@ class CustomCard extends StatelessWidget {
     var docId = snapshot.docs[index].id;
 
     TextEditingController nameInput =
-    new TextEditingController(text: snapshotData['name']);
+        new TextEditingController(text: snapshotData['name']);
     TextEditingController authorInput =
-    new TextEditingController(text: snapshotData['author']);
+        new TextEditingController(text: snapshotData['author']);
     TextEditingController rateInput =
-    new TextEditingController(text: snapshotData['rating']);
+        new TextEditingController(text: snapshotData['rating']);
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
@@ -219,7 +230,3 @@ class CustomCard extends StatelessWidget {
     Fluttertoast.showToast(msg: message);
   }
 }
-
-
-
-
